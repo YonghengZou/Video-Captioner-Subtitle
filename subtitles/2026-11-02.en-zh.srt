@@ -1,0 +1,164 @@
+1
+00:00:00,000 --> 00:00:03,380
+假如有一种人工智能可以阅读神经网络的大脑
+What if an AI could read a neural network's brain,
+
+2
+00:00:03,380 --> 00:00:06,560
+然后完全不经过训练就重新编写它，会怎样？
+and then rewrite it, without any training at all?
+
+3
+00:00:06,560 --> 00:00:11,562
+MIT的研究人员刚发表了一项名为"权重空间编程"的研究。
+Researchers at MIT just published something they call Weight-Space Programming.
+
+4
+00:00:11,562 --> 00:00:14,200
+通常，要改变神经网络
+Normally, to change a neural network,
+
+5
+00:00:14,200 --> 00:00:16,722
+你使用梯度下降来训练它
+you train it with gradient descent.
+
+6
+00:00:16,722 --> 00:00:19,110
+但这些研究人员跳过了这一步
+These researchers skipped that.
+
+7
+00:00:19,110 --> 00:00:21,470
+他们给了一款前沿的人工智能
+They gave a frontier AI
+
+8
+00:00:21,470 --> 00:00:23,550
+网络中的原始数字
+the raw numbers inside a network,
+
+9
+00:00:23,550 --> 00:00:26,000
+只是问了它几个问题
+and just asked it questions.
+
+10
+00:00:26,000 --> 00:00:30,670
+首先是阅读。给它大约一万七千个原始权重
+First, reading. Handed about seventeen thousand raw weights,
+
+11
+00:00:30,670 --> 00:00:33,770
+人工智能正确地辨别出了网络训练的游戏是哪一种
+the AI correctly named which game the network was trained on.
+
+12
+00:00:33,770 --> 00:00:37,890
+《Breakout》《Pong》《Pac-Man》《Freeway》
+Breakout, Pong, Pac-Man, Freeway.
+
+13
+00:00:37,890 --> 00:00:40,410
+全都猜对了
+All four, right.
+
+14
+00:00:40,410 --> 00:00:43,260
+然后是写作。完全没有训练
+Then, writing. With no training,
+
+15
+00:00:43,260 --> 00:00:45,840
+没有数据，也没有试运行
+no data, and no practice runs,
+
+16
+00:00:45,840 --> 00:00:49,760
+它从零编写了一个能玩《Breakout》的网络。
+it wrote a network from scratch that plays Breakout.
+
+17
+00:00:49,760 --> 00:00:54,692
+它还打败了一个经过上亿步训练的网络
+It beat a network trained for a hundred million steps.
+
+18
+00:00:54,692 --> 00:00:56,720
+最疯狂的是：
+And the wildest part:
+
+19
+00:00:56,720 --> 00:01:01,917
+他们给了一款容易陷入思维循环的小型语言模型
+they gave it a small language model that kept getting stuck in thinking loops.
+
+20
+00:01:01,917 --> 00:01:07,680
+但人工智能在其权重内找到了问题所在
+The AI found the problem inside the weights
+
+21
+00:01:07,680 --> 00:01:09,245
+并对它们进行了仅仅百分之零点一六的编辑
+and edited just point-zero-one-six percent of them.
+
+22
+00:01:09,245 --> 00:01:13,300
+数学准确性从百分之八提高到了百分之四十八
+Math accuracy jumped from eight percent to forty-eight percent.
+
+23
+00:01:15,680 --> 00:01:18,410
+现在还言之过早。
+It's early.
+
+24
+00:01:18,410 --> 00:01:22,270
+在另一个没有循环问题的模型中
+On another model that had no loop problem,
+
+25
+00:01:22,270 --> 00:01:24,370
+AI 什么都改进不了
+the AI couldn't improve anything.
+
+26
+00:01:24,370 --> 00:01:27,130
+调整权重可以去除障碍
+Editing weights can remove an obstacle,
+
+27
+00:01:27,130 --> 00:01:28,940
+却不能增加一项能力
+but it can't add an ability
+
+28
+00:01:28,940 --> 00:01:30,730
+也就是模型所缺乏的能力。
+the model lacks.
+
+29
+00:01:33,430 --> 00:01:38,080
+但想象一下，仅通过阅读权重就能审计AI是否有隐藏后门。
+But imagine auditing an AI for hidden backdoors
+
+30
+00:01:38,080 --> 00:01:40,467
+仅仅通过读取它的权重。
+just by reading its weights.
+
+31
+00:01:40,467 --> 00:01:45,940
+我们或许正在见证一种全新编程AI方式的开始。
+We may be watching the beginning of a new way to program AI.
+
+32
+00:01:45,940 --> 00:01:49,980
+关注我了解更多，并在评论区告诉我：
+Follow me for more, and tell me in the comments:
+
+33
+00:01:49,980 --> 00:01:53,440
+你会信任AI去编辑另一个AI吗？
+would you trust an AI to edit another AI?

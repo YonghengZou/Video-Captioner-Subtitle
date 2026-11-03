@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Source videos (large media, keep out of git)
+videos_en/
+videos_zh/
+
+# Generated outputs
+burned/
+images/
+
+# macOS
+.DS_Store

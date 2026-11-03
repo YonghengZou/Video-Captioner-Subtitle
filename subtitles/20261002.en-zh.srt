@@ -1,0 +1,79 @@
+1
+00:00:00,240 --> 00:00:07,440
+9月30日，Google刚刚宣布推出一款能够自行发现和修补安全漏洞的AI
+September 30th, Google just announced an AI that can find and patch security holes on its own.
+
+2
+00:00:07,440 --> 00:00:14,160
+这被称为Gemini 4 Organ，是Google为实际应用编写的最新一代模型，适用于编程、法律和金融领域，以及网络安全
+It's called Gemini 4 Organ, Google's new frontier model built for real-world coding,
+
+3
+00:00:14,160 --> 00:00:22,080
+此次重大更新中，输出限制从64,000个令牌增加到100万。这意味着它可以在一次运行中深入思考并解决复杂问题
+legal, and finance work, and cyber defense. First big upgrade, the output limit jumps from
+
+4
+00:00:22,080 --> 00:00:29,360
+内部测试显示，它已经投入应用。在几分钟的时间内，它超过了已发表的量子算法基线40%的成绩
+64,000 tokens to 1 million. That means it can think deeply and solve huge problems in a single
+
+5
+00:00:29,360 --> 00:00:38,560
+它的代理还释放了数据中心中超过300太字节的内存，并帮助研发了一个Rust视频解码器，运行速度提升了2.7倍
+run. Inside Google, it's already working. It beat a published quantum algorithm baseline by 40%
+
+6
+00:00:39,680 --> 00:00:46,160
+测评结果？最新的深度SWE技术在实际软件工程中达到顶级水平，在Zapier自动化测评中排名第一，视频理解准确率为91.7%
+in minutes. Its agents free up over 300 terabytes of memory in data centers,
+
+7
+00:00:46,160 --> 00:00:52,240
+更令人兴奋的是网络安全方面。Organ可以发现、验证并修补关键漏洞。Wits使用它发现了全球范围内广泛使用的基于IT的软件中存在的重大漏洞
+and it helped build a Rust video decoder that runs 2.7 times faster.
+
+8
+00:00:52,240 --> 00:00:58,720
+而在此之前，这些漏洞并没有被其他模型捕捉到
+The benchmarks? State-of-the-art deep SWE for real-world software engineering.
+
+9
+00:00:58,720 --> 00:01:11,200
+你现在可以用它吗？暂时还不能。它将首先向可信的网络安全部门开放。待Google加强防护后，付费API用户和Google AI Ultra订阅者将紧接其后
+77.9%, number one on Zapier's automation bench, and 91.7% on long video understanding.
+
+10
+00:01:11,760 --> 00:01:18,400
+现在提供给公众的价格是每百万输入令牌2美元，而订阅者价格是每百万输入令牌1.5美元，总计200万
+But the wild part is cybersecurity. Organ can find, validate, and patch critical
+
+11
+00:01:19,360 --> 00:01:27,840
+输入令牌的数量对应输出
+vulnerabilities. Wits used it to uncover a serious flaw in
+
+12
+00:01:27,840 --> 00:01:36,480
+Wits利用它发现了全球医疗系统中广泛使用的IT软件中存在的严重漏洞
+IT-based software used by hospitals worldwide. One that earlier frontier model missed.
+
+13
+00:01:37,760 --> 00:01:44,640
+此前的前沿模型未能发现这些漏洞
+Can you see it today? Not yet. It's rolling out to trusted cyber defenders first. While Google
+
+14
+00:01:44,640 --> 00:01:54,880
+Google正在增强保护措施，付费API用户和Google AI Ultra订阅者将紧随其后
+strengthens safeguards, paid API users and Google AI Ultra subscribers come next. The intro price is
+
+15
+00:01:54,880 --> 00:01:56,880
+现在提供的价格是每百万输入令牌2美元，订阅者价格是每百万输入令牌1.5美元，总计150万
+$2 per million in input tokens, and $1.5 per million in input tokens, which is $1.5 million.
+
+16
+00:01:56,880 --> 00:01:58,960
+输入令牌的数量对应输出
+Input tokens tend for output.

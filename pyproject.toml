@@ -1,0 +1,17 @@
+[project]
+name = "video-captioner-subtitle"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Yongheng", email = "yonghengzou@uvic.ca" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+video-captioner-subtitle = "video_captioner_subtitle:main"
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13.0"]
+build-backend = "uv_build"
