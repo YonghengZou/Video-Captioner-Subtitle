@@ -2,8 +2,6 @@ import re
 import subprocess
 from pathlib import Path
 
-import whisperx
-
 
 def _format_ts(seconds: float) -> str:
     total_ms = int(round(seconds * 1000))
@@ -58,6 +56,10 @@ def align_text_to_audio(
 
     audio = _extract_audio(video)
     try:
+        # whisperx is an optional dependency (heavy, GPU/CPU model download).
+        # Imported lazily so the package imports cleanly without it.
+        import whisperx
+
         device = "cpu"
         model = whisperx.load_model("large-v2", device=device, language=language)
         result = model.transcribe(str(audio))

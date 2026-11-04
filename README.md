@@ -91,4 +91,4 @@ bijian ASR (real, not estimated).
 
 - **英文视频**：bijian 转写（句级真实时间戳）→ 人工审核（用 `scripts/<日期>.md` 替换文字、时间戳不动，剔除 HOOK/SETUP 等分镜标注行）→ LLM 生成中英对照（**必须 `--no-split --no-optimize`**）→ 烧录成片
 - **中文视频**：bijian 中文转写 → 人工审核后烧录
-- 详细规则见 [`AGENTS.MD`](./AGENTS.MD)
+- 详细规则见 [`AGENTS.MD`](./AGENTS.md)
