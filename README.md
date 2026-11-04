@@ -1,5 +1,9 @@
 # Video Captioner Subtitle
 
+<p align="right">
+  <a href="./README.md">English</a> | <a href="./README.zh-CN.md">简体中文</a>
+</p>
+
 Subtitle generation, correction, translation and burning pipeline built on top of
 [`videocaptioner`](https://github.com/kilocode/videocaptioner) (bijian ASR + LLM
 translation + ffmpeg burning).
@@ -85,10 +89,8 @@ bijian ASR (real, not estimated).
 - `videocaptioner` installed (`pip install videocaptioner`)
 - For LLM translation: `SILICONFLOW_API_KEY` (or `OPENAI_API_KEY`) set in `.env`
 
-## 中文摘要
+---
 
-本仓库是基于 `videocaptioner` 的字幕生成 → 校正 → 翻译 → 烧录流水线。
-
-- **英文视频**：bijian 转写（句级真实时间戳）→ 人工审核（用 `scripts/<日期>.md` 替换文字、时间戳不动，剔除 HOOK/SETUP 等分镜标注行）→ LLM 生成中英对照（**必须 `--no-split --no-optimize`**）→ 烧录成片
-- **中文视频**：bijian 中文转写 → 人工审核后烧录
-- 详细规则见 [`AGENTS.MD`](./AGENTS.md)
+<p align="right">
+  <a href="./README.zh-CN.md">阅读中文版 / Read in Chinese</a>
+</p>
