@@ -14,20 +14,25 @@ wheels/
 .env.*
 !.env.example
 
-# Source videos (large media, keep out of git)
-videos_en/
-videos_zh/
+# Source videos (large media, keep out of git; keep folder placeholder)
+videos_en/*
+!videos_en/.gitkeep
+videos_zh/*
+!videos_zh/.gitkeep
 
-# Generated outputs
-burned/
+# Generated media (fully ignored)
 images/
 
-# Local agent / config
-.kilo/
+# Burned output (keep folder placeholder)
+burned/*
+!burned/.gitkeep
 
-# Working content (not for public)
-scripts/
-subtitles/
+# Config / working files (keep folders, ignore content)
+.kilo/
+scripts/*
+!scripts/.gitkeep
+subtitles/*
+!subtitles/.gitkeep
 
 # macOS
 .DS_Store
