@@ -22,5 +22,12 @@ videos_zh/
 burned/
 images/
 
+# Local agent / config
+.kilo/
+
+# Working content (not for public)
+scripts/
+subtitles/
+
 # macOS
 .DS_Store

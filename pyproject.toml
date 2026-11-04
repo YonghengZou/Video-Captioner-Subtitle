@@ -1,11 +1,8 @@
 [project]
 name = "video-captioner-subtitle"
 version = "0.1.0"
-description = "Add your description here"
+description = "Subtitle generation, correction, translation and burning pipeline for videos"
 readme = "README.md"
-authors = [
-    { name = "Yongheng", email = "yonghengzou@uvic.ca" }
-]
 requires-python = ">=3.12"
 dependencies = []
 
