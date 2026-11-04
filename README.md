@@ -10,8 +10,8 @@ translation + ffmpeg burning).
 videos_en/      Source English videos (.mov) — not tracked
 videos_zh/      Source Chinese videos (.mov) — not tracked
 subtitles/      All .srt files — not tracked
-burned/         Burned videos (.burned.mp4) — not tracked
 scripts/        Human-reviewed correction text — not tracked
+burned/         Burned videos (.burned.mp4) — not tracked
 src/video_captioner_subtitle/
     caption.py  Wrapper functions for the pipeline
     align.py    WhisperX forced-alignment helpers
@@ -84,3 +84,11 @@ bijian ASR (real, not estimated).
 - Python >= 3.12
 - `videocaptioner` installed (`pip install videocaptioner`)
 - For LLM translation: `SILICONFLOW_API_KEY` (or `OPENAI_API_KEY`) set in `.env`
+
+## 中文摘要
+
+本仓库是基于 `videocaptioner` 的字幕生成 → 校正 → 翻译 → 烧录流水线。
+
+- **英文视频**：bijian 转写（句级真实时间戳）→ 人工审核（用 `scripts/<日期>.md` 替换文字、时间戳不动，剔除 HOOK/SETUP 等分镜标注行）→ LLM 生成中英对照（**必须 `--no-split --no-optimize`**）→ 烧录成片
+- **中文视频**：bijian 中文转写 → 人工审核后烧录
+- 详细规则见 [`AGENTS.MD`](./AGENTS.MD)
