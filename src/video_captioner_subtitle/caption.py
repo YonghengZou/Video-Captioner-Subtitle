@@ -64,6 +64,8 @@ def generate_en_zh(en_srt: str | Path, out_path: str | Path | None = None) -> Pa
             "zh-Hans",
             "--layout",
             "target-above",
+            "--no-split",
+            "--no-optimize",
             "-o",
             str(out),
         ]

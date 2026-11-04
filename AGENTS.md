@@ -1,4 +1,6 @@
-# 字幕烧录规则
+## Python 环境
+
+Python 环境由 `uv` 管理，使用 `.venv`。运行代码时用 `uv run` 或激活 `.venv`。
 
 所有字幕统一使用 `videocaptioner` 的 bijian ASR 生成时间戳（真实时间，非估算），
 不要在代码里自行按字符比例估算时间轴。
