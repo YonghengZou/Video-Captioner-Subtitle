@@ -28,10 +28,7 @@ Python 环境由 `uv` 管理，使用 `.venv`。运行代码时用 `uv run` 或�
    ```
    videocaptioner transcribe <视频> --asr bijian --language en --format srt -o subtitles/<日期>.bijian.srt
    ```
-   用户审核后如有校正文本（如 scripts/ 下的脚本），用校正文本替换 SRT 的
-   文字，**时间戳保持 bijian 原始值不变**。
-   校正稿可能含有分镜标注行（全大写的 HOOK/SETUP/THE PROOF/CLOSE 等，可能带
-   `(0-5s)` 时间范围），不是台词，映射前必须剔除，正文以剔除后为准。
+   用户审核后如有校正文本（如 scripts/ 下的脚本），将审核后的文本列表（manual_texts）与 SRT 分段一一对应，用校正文本替换 SRT 的文字，**时间戳保持 bijian 原始值不变**。审核由人在对话框里按 script 和 .bijian.srt 逐段完成，代码只做机械替换，不自动修正文本。校正稿可能含有分镜标注行（全大写的 HOOK/SETUP/THE PROOF/CLOSE 等，可能带 `(0-5s)` 时间范围），不是台词，映射前必须剔除，正文以剔除后为准。
 
 2. **LLM 生成中英对照 SRT**：
    ```
@@ -52,7 +49,7 @@ Python 环境由 `uv` 管理，使用 `.venv`。运行代码时用 `uv run` 或�
    ```
    videocaptioner transcribe <视频> --asr bijian --language zh --format srt -o subtitles/<日期>.bijian.srt
    ```
-   审核后如有校正文本，用校正文本替换 SRT 文字，时间戳保持不变。
+   审核后如有校正文本，将人工审核后的文本列表与 SRT 分段一一对应，用校正文本替换 SRT 文字，时间戳保持不变。
 
 2. **烧录中文 SRT 进视频**：
    ```
@@ -64,7 +61,7 @@ Python 环境由 `uv` 管理，使用 `.venv`。运行代码时用 `uv run` 或�
 `src/video_captioner_subtitle/caption.py` 提供封装函数：
 - `generate_bijian_srt(video, out_path)` — 第一步
 - `generate_en_zh(en_srt, out_path)` — 第二步（内部须使用 `--no-split --no-optimize`）
-- `burn_subtitles(video, srt_path)` — 烧录
+- `burn_subtitles(video, srt_path)` — 烧录（输出默认落盘到 `burned/`）
 
 ### 一键流程（规划中，尚未实现）
 

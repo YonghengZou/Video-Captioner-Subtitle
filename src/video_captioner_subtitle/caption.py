@@ -2,6 +2,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 
 def _detect_language(video_path: Path) -> str:
     parent = video_path.parent.name.lower()
@@ -81,7 +83,9 @@ def burn_subtitles(video_path: str | Path, srt_path: str | Path | None = None) -
     if not srt.is_file():
         raise FileNotFoundError(f"SRT file not found: {srt}")
 
-    output = video.with_suffix(".burned.mp4")
+    burned_dir = PROJECT_ROOT / "burned"
+    burned_dir.mkdir(parents=True, exist_ok=True)
+    output = burned_dir / f"{video.stem}.burned.mp4"
     subtitle_filter = (
         f"subtitles={srt}:"
         f"charenc=utf-8:"
