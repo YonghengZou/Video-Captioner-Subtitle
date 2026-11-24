@@ -1,21 +1,22 @@
 import sys
 
-from . import caption
-
 
 def main() -> None:
-    """Command-line entry point: `video-captioner-subtitle <video|process> ...`.
+    """命令行入口：`video-captioner-subtitle [process <日期|视频>] ...`。
 
-    Delegates to ``caption.py``; the full one-shot pipeline
-    (``process <日期|视频路径>``) is planned but not yet implemented.
+    无参数或 `process` 时委托给 ``caption.process`` 一键流程；
+    传视频路径（可选 srt）时只烧录。
     """
+    from . import caption
+
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print("Usage:")
-        print("  video-captioner-subtitle <video> [srt]        burn subtitles into video")
-        print("  video-captioner-subtitle process <date|video> full pipeline (planned)")
-        return
-    if args[0] == "process":
-        print("process <日期|视频路径> is not yet implemented.")
+        print("  video-captioner-subtitle process <日期|视频> [--force]  一键流程")
+        print("  video-captioner-subtitle <视频> [srt]                   仅烧录")
         return
     caption.main()
+
+
+if __name__ == "__main__":
+    main()

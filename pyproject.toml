@@ -6,9 +6,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
 
-[project.optional-dependencies]
-align = ["whisperx"]
-
 [project.scripts]
 video-captioner-subtitle = "video_captioner_subtitle:main"
 

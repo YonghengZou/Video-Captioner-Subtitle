@@ -17,10 +17,19 @@ subtitles/      All .srt files — not tracked
 scripts/        Human-reviewed correction text — not tracked
 burned/         Burned videos (.burned.mp4) — not tracked
 src/video_captioner_subtitle/
-    caption.py  Wrapper functions for the pipeline
-    align.py    WhisperX forced-alignment helpers
-    siliconflow.py  SiliconFlow LLM client
+    caption.py             Wrapper functions + one-shot `process` pipeline
+    apply_manual_texts.py  Align reviewed script into the bijian SRT (word bridge)
 ```
+
+## One-shot pipeline
+
+```bash
+python -m video_captioner_subtitle.caption process <date|video> [--force]
+# alias: video-captioner-subtitle process <date|video> [--force]
+```
+
+Runs transcribe → (correct, if `scripts/<date>.md` exists) → translate (English videos) →
+burn, writing to the conventional paths. Existing outputs are skipped unless `--force`.
 
 ## Workflow
 
@@ -36,10 +45,17 @@ bijian ASR (real, not estimated).
        --format srt -o subtitles/<date>.bijian.srt
    ```
 
-2. **Review & correct** — replace the subtitle text with the reviewed script
-   (`scripts/<date>.md`). **Keep the original timestamps.** Scene marker lines
-   (e.g. `HOOK (0-5s)`, `SETUP`, `THE PROOF`, `CLOSE`) are not dialogue and must
-   be stripped before mapping.
+2. **Review & correct** — put the reviewed script in `scripts/<date>.md` (scene
+   marker lines such as `**Hook**`, `HOOK (0-5s)`, `[HOOK]` are stripped
+   automatically). Then align it into the SRT, keeping bijian timestamps:
+
+   ```bash
+   python -m video_captioner_subtitle.apply_manual_texts <date>
+   ```
+
+   The reviewed words are aligned to the ASR word sequence (difflib) so each
+   corrected word lands in the segment of the matching ASR word — no per-character
+   proportional splitting, and it is idempotent.
 
 3. **Bilingual subtitles** — translate with LLM, preserving segments and
    timestamps:
@@ -47,17 +63,20 @@ bijian ASR (real, not estimated).
    ```bash
    videocaptioner subtitle subtitles/<date>.bijian.srt --translator llm \
        --target-language zh-Hans --layout target-above --no-split --no-optimize \
-       -o subtitles/<date>.en-zh.srt
+       --batch-size 1 -o subtitles/<date>.en-zh.srt
    ```
 
-   `--no-split --no-optimize` is required: without them the LLM re-segments and
-   rewrites the English, desynchronising the subtitles.
+   `--no-split --no-optimize --batch-size 1` are required: without them the LLM
+   re-segments, rewrites the English, or merges short segments into a single
+   request, desynchronising the subtitles. `--batch-size 1` forces a strict 1:1
+   mapping (one request per segment), so the Chinese can never shift by a segment.
 
-4. **Burn**:
+4. **Burn** — use `caption.burn_subtitles()` (auto CJK font), not
+   `videocaptioner synthesize`:
 
    ```bash
-   videocaptioner synthesize videos_en/<date>.mov -s subtitles/<date>.en-zh.srt \
-       --subtitle-mode hard -o burned/<date>.burned.mp4
+   python -m video_captioner_subtitle.caption videos_en/<date>.mov \
+       subtitles/<date>.en-zh.srt
    ```
 
 ### Chinese video (`videos_zh/`)
@@ -79,15 +98,21 @@ bijian ASR (real, not estimated).
 
 `src/video_captioner_subtitle/caption.py`:
 
-- `generate_bijian_srt(video, out_path)` — step 1
-- `generate_en_zh(en_srt, out_path)` — step 2 (uses `--no-split --no-optimize`)
-- `burn_subtitles(video, srt_path)` — step 3
+- `generate_bijian_srt(video, out_path)` — transcribe
+- `generate_en_zh(en_srt, out_path)` — translate (`--batch-size 1`)
+- `burn_subtitles(video, srt_path)` — burn (auto CJK font)
+- `process(target, force=False)` — one-shot pipeline
+
+`src/video_captioner_subtitle/apply_manual_texts.py`:
+
+- `apply(date)` — align `scripts/<date>.md` into `subtitles/<date>.bijian.srt`
 
 ## Requirements
 
 - Python >= 3.12
 - `videocaptioner` installed (`pip install videocaptioner`)
-- For LLM translation: `SILICONFLOW_API_KEY` (or `OPENAI_API_KEY`) set in `.env`
+- For LLM translation: set the LLM API key/base/model via `videocaptioner config`
+  (or `OPENAI_API_KEY` / `OPENAI_BASE_URL`)
 
 ---
 

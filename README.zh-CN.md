@@ -16,10 +16,19 @@ subtitles/      所有 .srt 字幕 — 不纳入版本控制
 scripts/        人工审核后的校正文本 — 不纳入版本控制
 burned/         烧录成片（.burned.mp4）— 不纳入版本控制
 src/video_captioner_subtitle/
-    caption.py  流程封装函数
-    align.py    WhisperX 强制对齐辅助
-    siliconflow.py  SiliconFlow LLM 客户端
+    caption.py             流程封装 + 一键 `process`
+    apply_manual_texts.py  校正稿对齐（ASR 词桥接）
 ```
+
+## 一键流程
+
+```bash
+python -m video_captioner_subtitle.caption process <日期|视频> [--force]
+# 别名：video-captioner-subtitle process <日期|视频> [--force]
+```
+
+自动执行 转写 →（若有 `scripts/<日期>.md`）对齐校正 →（英文视频）翻译 → 烧录，
+按命名约定落盘。产物已存在则跳过，加 `--force` 重新生成。
 
 ## 流程
 
@@ -35,26 +44,34 @@ src/video_captioner_subtitle/
        --format srt -o subtitles/<日期>.bijian.srt
    ```
 
-2. **审核校正** — 用校正稿（`scripts/<日期>.md`）替换字幕文字，
-   **时间戳保持 bijian 原始值不变**。分镜标注行（如 `HOOK (0-5s)`、`SETUP`、
-   `THE PROOF`、`CLOSE`）不是台词，映射前必须剔除。
+2. **审核校正** — 校正稿放 `scripts/<日期>.md`（分镜标注行 `**Hook**`、
+   `HOOK (0-5s)`、`[HOOK]` 等会自动剔除），然后对齐进 SRT，时间戳保持不变：
+
+   ```bash
+   python -m video_captioner_subtitle.apply_manual_texts <日期>
+   ```
+
+   以 ASR 词序列为桥梁做 difflib 对齐，每个校正词落到对应 ASR 词所在分段，
+   不按字数比例硬切，可重复执行（幂等）。
 
 3. **生成中英对照** — LLM 翻译，保持分段和时间戳：
 
    ```bash
    videocaptioner subtitle subtitles/<日期>.bijian.srt --translator llm \
        --target-language zh-Hans --layout target-above --no-split --no-optimize \
-       -o subtitles/<日期>.en-zh.srt
+       --batch-size 1 -o subtitles/<日期>.en-zh.srt
    ```
 
-   必须加 `--no-split --no-optimize`：否则 LLM 会重新分段并改写英文，
-   导致字幕与声音不同步、偏离审核文本。
+   必须加 `--no-split --no-optimize --batch-size 1`：否则 LLM 会重新分段、改写英文，
+   或把多段合并进一个请求，导致中文整体错位。`--batch-size 1` 强制每段单独翻译、
+   一对一映射，中文不会再错位一段。
 
-4. **烧录**：
+4. **烧录** — 用 `caption.burn_subtitles()`（自动中文字体），不要用
+   `videocaptioner synthesize`：
 
    ```bash
-   videocaptioner synthesize videos_en/<日期>.mov -s subtitles/<日期>.en-zh.srt \
-       --subtitle-mode hard -o burned/<日期>.burned.mp4
+   python -m video_captioner_subtitle.caption videos_en/<日期>.mov \
+       subtitles/<日期>.en-zh.srt
    ```
 
 ### 中文视频（`videos_zh/`）
@@ -76,15 +93,20 @@ src/video_captioner_subtitle/
 
 `src/video_captioner_subtitle/caption.py`：
 
-- `generate_bijian_srt(video, out_path)` — 第一步
-- `generate_en_zh(en_srt, out_path)` — 第二步（使用 `--no-split --no-optimize`）
-- `burn_subtitles(video, srt_path)` — 第三步
+- `generate_bijian_srt(video, out_path)` — 转写
+- `generate_en_zh(en_srt, out_path)` — 翻译（`--batch-size 1`）
+- `burn_subtitles(video, srt_path)` — 烧录（自动中文字体）
+- `process(target, force=False)` — 一键流程
+
+`src/video_captioner_subtitle/apply_manual_texts.py`：
+
+- `apply(date)` — 把 `scripts/<日期>.md` 对齐进 `subtitles/<日期>.bijian.srt`
 
 ## 环境要求
 
 - Python >= 3.12
 - 已安装 `videocaptioner`（`pip install videocaptioner`）
-- LLM 翻译需在 `.env` 中设置 `SILICONFLOW_API_KEY`（或 `OPENAI_API_KEY`）
+- LLM 翻译通过 `videocaptioner config` 设置 API key/base/model（或 `OPENAI_API_KEY` / `OPENAI_BASE_URL`）
 
 ## 说明
 
