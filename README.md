@@ -18,7 +18,8 @@ scripts/        Human-reviewed correction text — not tracked
 burned/         Burned videos (.burned.mp4) — not tracked
 src/video_captioner_subtitle/
     caption.py             Wrapper functions + one-shot `process` pipeline
-    apply_manual_texts.py  Align reviewed script into the bijian SRT (word bridge)
+    sentences.py           Build whole-sentence SRT from reviewed script + word timings
+    apply_manual_texts.py  (Alternative) align reviewed script into an existing SRT
 ```
 
 ## One-shot pipeline
@@ -28,8 +29,9 @@ python -m video_captioner_subtitle.caption process <date|video> [--force]
 # alias: video-captioner-subtitle process <date|video> [--force]
 ```
 
-Runs transcribe → (correct, if `scripts/<date>.md` exists) → translate (English videos) →
-burn, writing to the conventional paths. Existing outputs are skipped unless `--force`.
+Runs transcribe → whole-sentence alignment from the reviewed script (word-level
+transcribe + `sentences`, if `scripts/<date>.md` exists) → translate (English videos)
+→ burn, writing to the conventional paths. Existing outputs are skipped unless `--force`.
 
 ## Workflow
 
@@ -38,24 +40,27 @@ bijian ASR (real, not estimated).
 
 ### English video (`videos_en/`)
 
-1. **Transcribe** (sentence-level, real timestamps) for human review:
+1. **Transcribe** with word-level timestamps (`--word-timestamps`) to anchor real
+   timings, and put the reviewed script in `scripts/<date>.md` (scene marker lines
+   such as `**Hook**`, `HOOK (0-5s)`, `[HOOK]` are stripped automatically):
 
    ```bash
    videocaptioner transcribe videos_en/<date>.mov --asr bijian --language en \
-       --format srt -o subtitles/<date>.bijian.srt
+       --format srt --word-timestamps -o subtitles/<date>.word.srt
    ```
 
-2. **Review & correct** — put the reviewed script in `scripts/<date>.md` (scene
-   marker lines such as `**Hook**`, `HOOK (0-5s)`, `[HOOK]` are stripped
-   automatically). Then align it into the SRT, keeping bijian timestamps:
+2. **Whole-sentence SRT** — split the reviewed script into complete sentences and
+   give each one its real start/end from the word timings, producing a
+   sentence-level `subtitles/<date>.bijian.srt` (whole sentences, no fragments, real
+   timestamps; idempotent):
 
    ```bash
-   python -m video_captioner_subtitle.apply_manual_texts <date>
+   python -m video_captioner_subtitle.sentences <date>
    ```
 
-   The reviewed words are aligned to the ASR word sequence (difflib) so each
-   corrected word lands in the segment of the matching ASR word — no per-character
-   proportional splitting, and it is idempotent.
+   > Alternative: `python -m video_captioner_subtitle.apply_manual_texts <date>`
+   > bridges the reviewed words back onto an existing sentence-level ASR segmentation
+   > (keeps the ASR segments instead of whole sentences).
 
 3. **Bilingual subtitles** — translate with LLM, preserving segments and
    timestamps:
@@ -103,9 +108,13 @@ bijian ASR (real, not estimated).
 - `burn_subtitles(video, srt_path)` — burn (auto CJK font)
 - `process(target, force=False)` — one-shot pipeline
 
+`src/video_captioner_subtitle/sentences.py`:
+
+- `apply(date)` — build whole-sentence `subtitles/<date>.bijian.srt` from `subtitles/<date>.word.srt` + `scripts/<date>.md` (real word timestamps)
+
 `src/video_captioner_subtitle/apply_manual_texts.py`:
 
-- `apply(date)` — align `scripts/<date>.md` into `subtitles/<date>.bijian.srt`
+- `apply(date)` — (alternative) align `scripts/<date>.md` into an existing `subtitles/<date>.bijian.srt`
 
 ## Requirements
 

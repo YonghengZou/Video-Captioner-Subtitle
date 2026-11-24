@@ -17,7 +17,8 @@ scripts/        人工审核后的校正文本 — 不纳入版本控制
 burned/         烧录成片（.burned.mp4）— 不纳入版本控制
 src/video_captioner_subtitle/
     caption.py             流程封装 + 一键 `process`
-    apply_manual_texts.py  校正稿对齐（ASR 词桥接）
+    sentences.py           用校正稿整句 + 词级时间戳生成句级字幕
+    apply_manual_texts.py  （备选）把校正稿对齐进既有 SRT
 ```
 
 ## 一键流程
@@ -27,8 +28,8 @@ python -m video_captioner_subtitle.caption process <日期|视频> [--force]
 # 别名：video-captioner-subtitle process <日期|视频> [--force]
 ```
 
-自动执行 转写 →（若有 `scripts/<日期>.md`）对齐校正 →（英文视频）翻译 → 烧录，
-按命名约定落盘。产物已存在则跳过，加 `--force` 重新生成。
+自动执行 转写 →（若有 `scripts/<日期>.md`）词级转写 + `sentences` 生成整句字幕 →
+（英文视频）翻译 → 烧录，按命名约定落盘。产物已存在则跳过，加 `--force` 重新生成。
 
 ## 流程
 
@@ -37,22 +38,23 @@ python -m video_captioner_subtitle.caption process <日期|视频> [--force]
 
 ### 英文视频（`videos_en/`）
 
-1. **转写**（句级、真实时间戳），交人工审核：
+1. **词级转写**（`--word-timestamps`，给每词真实时间做时间轴锚点），并把审核稿放
+   `scripts/<日期>.md`（分镜标注行 `**Hook**`、`HOOK (0-5s)`、`[HOOK]` 等会自动剔除）：
 
    ```bash
    videocaptioner transcribe videos_en/<日期>.mov --asr bijian --language en \
-       --format srt -o subtitles/<日期>.bijian.srt
+       --format srt --word-timestamps -o subtitles/<日期>.word.srt
    ```
 
-2. **审核校正** — 校正稿放 `scripts/<日期>.md`（分镜标注行 `**Hook**`、
-   `HOOK (0-5s)`、`[HOOK]` 等会自动剔除），然后对齐进 SRT，时间戳保持不变：
+2. **生成整句字幕** — 按校正稿的完整句子切分，用词级时间戳给每句取真实起止时间，
+   生成句级 `subtitles/<日期>.bijian.srt`（整句、不碎句、真实时间戳，幂等）：
 
    ```bash
-   python -m video_captioner_subtitle.apply_manual_texts <日期>
+   python -m video_captioner_subtitle.sentences <日期>
    ```
 
-   以 ASR 词序列为桥梁做 difflib 对齐，每个校正词落到对应 ASR 词所在分段，
-   不按字数比例硬切，可重复执行（幂等）。
+   > 备选：`python -m video_captioner_subtitle.apply_manual_texts <日期>` 会把校正稿
+   > 按 ASR 词桥接填回既有分段（保留 ASR 分段，而非整句）。
 
 3. **生成中英对照** — LLM 翻译，保持分段和时间戳：
 
@@ -98,9 +100,13 @@ python -m video_captioner_subtitle.caption process <日期|视频> [--force]
 - `burn_subtitles(video, srt_path)` — 烧录（自动中文字体）
 - `process(target, force=False)` — 一键流程
 
+`src/video_captioner_subtitle/sentences.py`：
+
+- `apply(date)` — 用 `subtitles/<日期>.word.srt` + `scripts/<日期>.md` 生成整句级 `subtitles/<日期>.bijian.srt`（真实词级时间戳）
+
 `src/video_captioner_subtitle/apply_manual_texts.py`：
 
-- `apply(date)` — 把 `scripts/<日期>.md` 对齐进 `subtitles/<日期>.bijian.srt`
+- `apply(date)` — （备选）把 `scripts/<日期>.md` 对齐进既有 `subtitles/<日期>.bijian.srt`
 
 ## 环境要求
 
@@ -111,7 +117,7 @@ python -m video_captioner_subtitle.caption process <日期|视频> [--force]
 ## 说明
 
 - 详细流程规则见 [`AGENTS.md`](./AGENTS.md)
-- 词级锚定（`--word-timestamps`）只在句级时间戳明显漂移时按需使用，不是流程必选项
+- 有审核稿时用 `--word-timestamps` 词级转写 + `sentences` 生成整句字幕（默认流程）
 
 ---
 
