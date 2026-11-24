@@ -113,7 +113,7 @@ def _build_subtitle_filter(srt: Path) -> str:
     return (
         f"subtitles={srt}:"
         f"charenc=utf-8:"
-        f"force_style='{font_style}Fontsize=20,"
+        f"force_style='{font_style}Fontsize=16,"
         f"PrimaryColour=&HFFFFFF,BackColour=&H000000,"
         f"Bold=1,Outline=2,Shadow=1,BorderStyle=3,Alignment=2'"
     )
@@ -267,7 +267,7 @@ def process(target: str | Path, force: bool = False) -> Path:
         else:
             print(f"skip transcribe (exists): {paths['bijian']}")
 
-    # 2. 翻译（英文视频：生成中英对照）
+    # 2. 翻译（英文视频：生成中英对照，整句烧录）
     if language == "en":
         if force or not _is_fresh(paths["en_zh"], paths["bijian"]):
             generate_en_zh(paths["bijian"], paths["en_zh"])
