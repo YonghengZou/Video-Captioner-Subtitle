@@ -29,9 +29,7 @@ def _is_fresh(out: Path, *sources: Path) -> bool:
     if not out.is_file():
         return False
     out_mtime = out.stat().st_mtime
-    return all(
-        out_mtime >= src.stat().st_mtime for src in sources if src.is_file()
-    )
+    return all(out_mtime >= src.stat().st_mtime for src in sources if src.is_file())
 
 
 # 系统中文字体优先级列表（macOS / Linux 通用，按常见度排序）
@@ -60,9 +58,7 @@ def _detect_language(video_path: Path) -> str:
 def _list_system_fonts() -> list[str]:
     """通过 fc-list 列出系统已安装字体的 family 名称。"""
     try:
-        result = subprocess.run(
-            ["fc-list", ":family"], capture_output=True, text=True, timeout=10
-        )
+        result = subprocess.run(["fc-list", ":family"], capture_output=True, text=True, timeout=10)
         if result.returncode != 0:
             return []
         fonts: list[str] = []
@@ -85,11 +81,7 @@ def _detect_cjk_font() -> str | None:
     for candidate in _CJK_FONT_CANDIDATES:
         if candidate.lower() in installed_lower:
             return candidate
-    # fc-list 未列出候选时，回退到常见中文字族名（macOS 通用）
-    for fallback in ("Hiragino Sans GB", "Heiti SC", "PingFang SC", "STHeiti", "SimHei"):
-        if fallback.lower() in installed_lower:
-            return fallback
-    # 最后兜底：只要 family 名中含 CJK 字符，就认为系统有中文字体
+    # 兜底：只要 family 名中含 CJK 字符，就认为系统有中文字体
     for name in installed:
         for ch in name:
             if "\u4e00" <= ch <= "\u9fff" or "\u3000" <= ch <= "\u303f":
@@ -260,6 +252,7 @@ def process(target: str | Path, force: bool = False) -> Path:
     paths = _paths(date)
     print(f"== process {date} ({language}) ==")
 
+    # 1. 转写
     if paths["script"].is_file():
         # 有校正稿：词级转写 + 用整句生成句级 SRT（真实词级时间戳）
         if force or not paths["word"].is_file():
@@ -274,7 +267,7 @@ def process(target: str | Path, force: bool = False) -> Path:
         else:
             print(f"skip transcribe (exists): {paths['bijian']}")
 
-    # 英文视频：生成中英对照
+    # 2. 翻译（英文视频：生成中英对照）
     if language == "en":
         if force or not _is_fresh(paths["en_zh"], paths["bijian"]):
             generate_en_zh(paths["bijian"], paths["en_zh"])
@@ -284,7 +277,7 @@ def process(target: str | Path, force: bool = False) -> Path:
     else:
         burn_srt = paths["bijian"]
 
-    # 4. 烧录（成片比字幕新则跳过）
+    # 3. 烧录（成片比字幕新则跳过）
     if not force and _is_fresh(paths["burned"], burn_srt):
         print(f"skip burn (up-to-date): {paths['burned']}")
         return paths["burned"]

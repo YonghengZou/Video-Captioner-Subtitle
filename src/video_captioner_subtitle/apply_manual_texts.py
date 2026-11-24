@@ -7,6 +7,7 @@ bijian 真实时间戳，不按字数比例硬切，也就不会出现把一句�
 
 用法: python -m video_captioner_subtitle.apply_manual_texts <日期>
 """
+
 import difflib
 import re
 import sys
@@ -66,18 +67,14 @@ def parse_srt(srt_path: str | Path) -> list[dict]:
         )
         if not m:
             continue
-        segments.append(
-            {"index": index, "start": m.group(1), "end": m.group(2), "text": text}
-        )
+        segments.append({"index": index, "start": m.group(1), "end": m.group(2), "text": text})
     return segments
 
 
 def render_srt(segments: list[dict]) -> str:
     blocks = []
     for seg in segments:
-        blocks.append(
-            f"{seg['index']}\n{seg['start']} --> {seg['end']}\n{seg['text']}\n"
-        )
+        blocks.append(f"{seg['index']}\n{seg['start']} --> {seg['end']}\n{seg['text']}\n")
     return "\n".join(blocks)
 
 
@@ -95,7 +92,7 @@ def _norm(word: str) -> str:
     return re.sub(r"[^0-9a-z]", "", word.lower())
 
 
-def _align_corrected(segments: list[dict], paragraphs: list[str]) -> list[int]:
+def _align_corrected(segments: list[dict], paragraphs: list[str]) -> list[int | None]:
     """把校正词分配到各 SRT 分段，返回每个校正词的段索引映射。"""
     asr_tokens: list[str] = []
     asr_seg_ids: list[int] = []
@@ -150,7 +147,7 @@ def align_corrected(segments: list[dict], paragraphs: list[str]) -> list[int]:
 
     by_seg: dict[int, list[str]] = {seg["index"]: [] for seg in segments}
     last_seg = segments[0]["index"]
-    for tok, seg_id in zip(corr_tokens, seg_of_corr):
+    for tok, seg_id in zip(corr_tokens, seg_of_corr, strict=False):
         if seg_id is None:
             seg_id = last_seg
         by_seg[seg_id].append(tok)

@@ -5,13 +5,15 @@
 
 用法: python -m video_captioner_subtitle.sentences <日期>
 """
+
 import difflib
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
-from .apply_manual_texts import load_corrected_texts, render_srt, write_srt
+from .apply_manual_texts import load_corrected_texts, write_srt
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SUBTITLES = PROJECT_ROOT / "subtitles"
@@ -22,12 +24,12 @@ _EN_SENT = re.compile(r'(?<=[.!?])\s+(?=[A-Z0-9"\u201c\u2018])')
 _CJK_SENT = re.compile(r"(?<=[。！？])")
 
 
-def _parse_words(word_srt: Path) -> list[dict]:
+def _parse_words(word_srt: Path) -> list[dict[str, Any]]:
     """解析词级 SRT，返回 [{'text','start','end'}]，时间为秒。"""
-    out = []
+    out: list[dict[str, Any]] = []
     content = word_srt.read_text(encoding="utf-8")
     for block in re.split(r"\n\s*\n", content.strip()):
-        lines = [l for l in block.splitlines() if l.strip()]
+        lines = [ln for ln in block.splitlines() if ln.strip()]
         if len(lines) < 3:
             continue
         m = re.match(
@@ -45,7 +47,9 @@ def _parse_words(word_srt: Path) -> list[dict]:
 
 def _fmt(seconds: float) -> str:
     ms = int(round(seconds * 1000))
-    return f"{ms // 3600000:02d}:{ms % 3600000 // 60000:02d}:{ms % 60000 // 1000:02d},{ms % 1000:03d}"
+    return (
+        f"{ms // 3600000:02d}:{ms % 3600000 // 60000:02d}:{ms % 60000 // 1000:02d},{ms % 1000:03d}"
+    )
 
 
 def _split_sentences(text: str) -> list[str]:
@@ -58,9 +62,7 @@ def _split_sentences(text: str) -> list[str]:
         chunk = chunk.strip()
         if not chunk:
             continue
-        sentences.extend(
-            s.strip() for s in _EN_SENT.split(chunk) if s and s.strip()
-        )
+        sentences.extend(s.strip() for s in _EN_SENT.split(chunk) if s and s.strip())
     return sentences
 
 
@@ -120,10 +122,10 @@ def build_sentence_srt(word_srt: Path, md_path: Path, out_srt: Path) -> bool:
             spans[si] = (words[min(ids)]["start"], words[max(ids)]["end"])
 
     last_end = 0.0
-    for si, span in enumerate(spans):
-        if span is None:
+    for si, spn in enumerate(spans):
+        if spn is None:
             continue
-        start, end = span
+        start, end = spn
         start = max(start, last_end)
         if end <= start:
             end = start + 0.6
@@ -131,21 +133,23 @@ def build_sentence_srt(word_srt: Path, md_path: Path, out_srt: Path) -> bool:
         last_end = end
 
     # 未对齐句子：用前一句结束到下一句开始之间插值，避免丢词
-    for si, span in enumerate(spans):
-        if span is not None:
+    for si, spn in enumerate(spans):
+        if spn is not None:
             continue
-        prev_end = spans[si - 1][1] if si > 0 and spans[si - 1] else last_end
-        nxt = next((spans[j][0] for j in range(si + 1, len(spans)) if spans[j]), None)
+        prev = spans[si - 1] if si > 0 else None
+        prev_end = prev[1] if prev else last_end
+        nxt_span = next((spans[j] for j in range(si + 1, len(spans)) if spans[j]), None)
+        nxt = nxt_span[0] if nxt_span is not None else None
         start = prev_end
         end = nxt if nxt is not None and nxt > start else start + 0.6
         spans[si] = (start, end)
 
     segments = []
     for si, sent in enumerate(sentences):
-        start, end = spans[si]
-        segments.append(
-            {"index": si + 1, "start": _fmt(start), "end": _fmt(end), "text": sent}
-        )
+        spn = spans[si]
+        assert spn is not None
+        start, end = spn
+        segments.append({"index": si + 1, "start": _fmt(start), "end": _fmt(end), "text": sent})
 
     return write_srt(out_srt, segments)
 
